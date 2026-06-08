@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You 💌</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Poppins:wght@300;500&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #fcf9f2; 
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* --- ENVELOPE SCREEN --- */
+        #envelope-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            transition: opacity 1s ease, transform 1s ease;
+            position: relative; 
+        }
+
+        /* Floating Decorations */
+        .decor {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.6;
+            animation: float 3s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        .decor:nth-child(1) { top: 20%; left: 15%; animation-delay: 0s; }
+        .decor:nth-child(2) { top: 70%; left: 10%; animation-delay: 0.5s; font-size: 1.5rem; }
+        .decor:nth-child(3) { top: 25%; right: 15%; animation-delay: 1s; }
+        .decor:nth-child(4) { top: 65%; right: 10%; animation-delay: 1.5s; font-size: 2.5rem; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            z-index: 10;
+        }
+
+        .envelope-wrapper:hover {
+            transform: scale(1.02);
+        }
+
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #e8d5c4;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .envelope::before { 
+            content: '';
+            position: absolute;
+            border-top: 100px solid transparent;
+            border-bottom: 100px solid transparent;
+            border-left: 150px solid #dfcbb9;
+            z-index: 2;
+        }
+        .envelope::after { 
+            content: '';
+            position: absolute;
+            right: 0;
+            border-top: 100px solid transparent;
+            border-bottom: 100px solid transparent;
+            border-right: 150px solid #dfcbb9;
+            z-index: 2;
+        }
+
+        .bottom-flap {
+            position: absolute;
+            bottom: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-bottom: 100px solid #d4c0ae;
+            z-index: 3;
+        }
+
+        /* Top flap - Fixed the z-index so it tucks behind the letter when open */
+        .top-flap {
+            position: absolute;
+            top: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid #ebdaca;
+            transform-origin: top;
+            transition: transform 0.6s ease, z-index 0s linear 0s;
+            z-index: 4;
+        }
+
+        .envelope-wrapper.open .top-flap {
+            transform: rotateX(180deg);
+            z-index: 0;
+            transition: transform 0.6s ease, z-index 0s linear 0.3s;
+        }
+
+        .seal {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: #b73e3e;
+            border-radius: 50%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: opacity 0.3s;
+        }
+
+        /* The Letter - Made the font bolder and ensured it stays on top */
+        .letter {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            width: 270px;
+            height: 180px;
+            background: white;
+            z-index: 1;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Caveat', cursive;
+            font-size: 1.5rem; 
+            font-weight: 600;
+            color: #2b2b2b;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.8s ease 0.4s;
+            padding: 15px;
+            box-sizing: border-box;
+            text-align: center; 
+            line-height: 1.2;
+        }
+
+        .envelope-wrapper.open .seal {
+            opacity: 0;
+        }
+        
+        .envelope-wrapper.open .letter {
+            transform: translateY(-145px); 
+        }
+
+        .tap-text {
+            margin-top: 40px;
+            color: #888;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* --- MEMORY WALL SCREEN --- */
+        #memory-wall {
+            display: none;
+            opacity: 0;
+            width: 100vw;
+            min-height: 100vh;
+            padding: 60px 20px 40px 20px; 
+            box-sizing: border-box;
+            transition: opacity 1.5s ease;
+            position: relative;
+        }
+
+        #back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #e8d5c4;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        #back-btn:hover {
+            background-color: #dfcbb9;
+            transform: translateX(-3px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a4a4a;
+            font-weight: 300;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            font-size: 1.8rem; 
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            perspective: 1000px; 
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .flip-card-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .flip-card-back {
+            background-color: #fff;
+            color: #333;
+            transform: rotateY(180deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            font-family: 'Caveat', cursive;
+            font-size: 1.8rem;
+            line-height: 1.3;
+            border: 2px solid #f3e5d8;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.4rem; margin-top: 40px; }
+            #back-btn { top: 15px; left: 15px; padding: 8px 15px; font-size: 0.8rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="envelope-screen">
+        <div class="decor">✨</div>
+        <div class="decor">💖</div>
+        <div class="decor">🎉</div>
+        <div class="decor">✨</div>
+         <div class="decor">✨</div>
+          <div class="decor">✨</div>
+           <div class="decor">✨</div>
+            <div class="decor">✨</div>
+
+        <div class="envelope-wrapper" id="envelope">
+            <div class="envelope"></div>
+            <div class="letter">Happy Birthday<br>Simisola Nifemi Cline! 🎉</div>
+            <div class="bottom-flap"></div>
+            <div class="top-flap"></div>
+            <div class="seal">Tap</div>
+        </div>
+        <div class="tap-text">Tap the envelope to open</div>
+    </div>
+
+    <div id="memory-wall">
+        <button id="back-btn">← Back</button>
+        
+        <h1>happy birthday Simisola Nifemi Cline! 💕</h1>
+        <div class="grid-container" id="grid">
+        </div>
+             <div class="ttext"></div>
+             <h3 style="text-align: center; font-family: 'Times New Roman', Times, serif;">Have an amazing day 🩷 ~ lami </h3>
+        
+    </div>
+
+    <script>
+        const memories = [
+            {
+                image: "img_1925.jpeg",
+                note: "Happy Birthday to you simii"
+            },
+            {
+                image: "img_2210.jpeg",
+                note: "I love you so much and i wish you the best"
+            },
+            {
+                image: "img_1935.jpeg",
+                note: "i wish you nothing but the best"
+            },
+            {
+                image: "img_2690.jpeg",
+                note: "more money, more blessings, more joy, opportunites and so much more"
+            },
+            {
+                image: "img_1927.jpeg",
+                note: "I hope you have a glorious day! "
+            },
+            {
+                image: "IMG_1926.jpeg",
+                note: "love youuuu"
+            },
+            {
+                image: "IMG_1938.jpeg",
+                note: "fav 🩷"
+            },
+            {
+                image: "P1010106.jpeg",
+                note: "Cheers to making more amazing memories!"
+            },
+
+       
+        ];
+
+           
+
+        const envelope = document.getElementById('envelope');
+        const envelopeScreen = document.getElementById('envelope-screen');
+        const memoryWall = document.getElementById('memory-wall');
+        const grid = document.getElementById('grid');
+        const backBtn = document.getElementById('back-btn');
+
+        memories.forEach(memory => {
+            const cardHTML = `
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <img src="${memory.image}" alt="Memory">
+                        </div>
+                        <div class="flip-card-back">
+                            <p>${memory.note}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            grid.innerHTML += cardHTML;
+        });
+
+        // The Opening Animation Handle
+        envelope.addEventListener('click', () => {
+            envelope.classList.add('open');
+
+            // I increased this timeout from 2000ms to 4000ms so there is plenty of time to read the card!
+            setTimeout(() => {
+                envelopeScreen.style.transform = 'scale(2.0)';
+                envelopeScreen.style.opacity = '0';
+                
+                setTimeout(() => {
+                    envelopeScreen.style.display = 'none';
+                    memoryWall.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        memoryWall.style.opacity = '1';
+                    }, 150);
+                    
+                }, 1090);
+            }, 2000); 
+        });
+
+        // The Back Button Handle
+        backBtn.addEventListener('click', () => {
+            memoryWall.style.opacity = '0';
+            
+            setTimeout(() => {
+                memoryWall.style.display = 'none';
+                
+                envelopeScreen.style.display = 'flex';
+                envelopeScreen.style.transform = 'scale(1)';
+                
+                envelope.classList.remove('open');
+                
+                setTimeout(() => {
+                    envelopeScreen.style.opacity = '1';
+                }, 100);
+                
+            }, 1000); 
+        });
+    </script>
+</body>
+</html>
